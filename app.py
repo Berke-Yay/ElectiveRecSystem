@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 driver = GraphDatabase.driver(
     "bolt://localhost:7687",
-    auth=("neo4j", "postgresql!") 
+    auth=("neo4j", "password_goes_here") 
 )
 
 def get_course_recommendations(tx, major):
