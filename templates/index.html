@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course Recommendation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .results {
+            list-style: none;
+            padding: 0;
+        }
+        .course-card {
+            background: lightgrey;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Course Recommender</h1>
+    <div class="search-box">
+        <input type="text" id="majorInput" placeholder="Enter your desired major">
+        <button onclick="getRecommendations()">Get Recommendations</button>
+    </div>
+    <ul id="results" class="results"></ul>
+
+    <script>
+        function getRecommendations() {
+            const major = document.getElementById('majorInput').value;
+            if (!major) {
+                alert('Please enter a major');
+                return;
+            }
+    
+            const results = document.getElementById('results');
+            results.innerHTML = '<li class="course-card">Loading...</li>';
+    
+            fetch(`/recommend?major=${encodeURIComponent(major)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.json();
+                })
+                .then(data => {
+                    results.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        results.innerHTML = '<li class="course-card">No courses found for this major</li>';
+                        return;
+                    }
+    
+                    data.forEach(course => {
+                        const li = document.createElement('li');
+                        li.className = 'course-card';
+                        li.innerHTML = `
+                            <h3>${course.code} - ${course.name}</h3>
+                            <p>Recommendation Score: ${course.score?.toFixed(2) ?? 'N/A'}</p>
+                        `;
+                        results.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    results.innerHTML = `<li class="course-card" style="color: red">Error: ${error.message}</li>`;
+                });
+        }
+    </script>
+</body>
+</html>
