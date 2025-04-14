@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Student</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid black;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .elective-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .elective-section span {
+            display: block;
+            font-size: 1.1rem;
+            color: black;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .course {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        button[type="submit"] {
+            background: black;
+            color: white;
+            padding: 1rem 2rem;
+            border: 1px solid black;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        button[type="submit"]:hover {
+            background: white;
+            color: black;
+        }
+
+        .course input::placeholder {
+            color: #95a5a6;
+        }
+
+        .elective-section:nth-child(even) {
+            background: #dfe1e3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Elective Form</h1>
+        <datalist id="courseOptions"></datalist>
+
+        <form onsubmit="submitForm(event)">
+            <div class="form-group">
+                <label for="student_id">Student ID</label>
+                <input type="text" id="student_id" required>
+            </div>
+
+            <div class="form-group">
+                <label for="major">Major</label>
+                <input type="text" id="major" required>
+            </div>
+
+            <div class="form-group">
+                <label for="grad_year">Graduation Year</label>
+                <input type="text" id="grad_year" required>
+            </div>
+
+            <div id="courses" class="elective-section">
+                
+            </div>
+
+            <button type="submit">Submit Enrollment</button>
+        </form>
+    </div>
+
+    <script>
+        let courseCount = 1;
+        let courseOptions = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/courses');
+                const courses = await response.json();
+                courseOptions = courses;
+                updateCourseDatalist();
+            } catch (error) {
+                console.error('Failed to load courses:', error);
+            }
+        });
+
+        function updateCourseDatalist() {
+            const datalist = document.getElementById('courseOptions');
+
+            datalist.innerHTML = '';
+
+            courseOptions.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.code;
+                option.textContent = course.name;
+                datalist.appendChild(option);
+            });
+        }
+
+        function addCourse() {
+            const container = document.getElementById('courses');
+            for(let i=0;i<10;i++){
+                const div = document.createElement('div');
+                if(i==0){
+                    div.innerHTML = '<span>L10 Elective</span>';
+                }
+                else if(i==1){
+                    div.innerHTML = '<span>L11 Electives</span>';
+                }
+                else if(i==5){
+                    div.innerHTML = '<span>L12 Electives</span>';
+                }
+                div.innerHTML += `
+                    <div class="course">
+                        <input type="text" list="courseOptions" 
+                            placeholder="Search or select course" 
+                            id="course_${courseCount}" required>
+                        <input type="text" placeholder="Final Grade" 
+                            id="grade_${courseCount}" required>
+                    </div>
+                `;
+                container.appendChild(div);
+                courseCount++;
+            }
+        }
+        addCourse();
+
+        async function submitForm(e) {
+            e.preventDefault();
+            const formData = {
+                student_id: document.getElementById('student_id').value,
+                major: document.getElementById('major').value,
+                grad_year: document.getElementById('grad_year').value,
+                courses: []
+            };
+
+            // Collect course data
+            const courseElements = document.querySelectorAll('[id^="course_"]');
+            const gradeElements = document.querySelectorAll('[id^="grade_"]');
+
+            for (let i = 0; i < courseElements.length; i++) {
+                let level;
+                if(i==0){
+                    level = "L10";
+                }
+                else if(i<5){
+                    level = "L11";
+                }
+                else{
+                    level = "L12";
+                }
+                formData.courses.push({
+                    course_id: courseElements[i].value,
+                    grade: gradeElements[i].value,
+                    level: level
+                });
+            }
+
+            try {
+                const response = await fetch('/add_student', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Student added successfully!');
+                    window.location.reload();
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert('Failed to submit form');
+            }
+        }
+    </script>
+</body>
+</html>

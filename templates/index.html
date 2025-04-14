@@ -8,55 +8,99 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f5f5f5;
         }
         .search-box {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            position: relative;
         }
         input {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
         }
         button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             background: black;
             color: white;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: rgb(33, 33, 33);
         }
         .results {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
         .course-card {
-            background: lightgrey;
-            padding: 15px;
+            background: white;
+            padding: 20px;
             margin-bottom: 10px;
             border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        datalist {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            top: 100%;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
     <h1>Course Recommender</h1>
     <div class="search-box">
-        <input type="text" id="majorInput" placeholder="Enter your desired major">
+        <input type="text" id="majorInput" list="majorOptions" placeholder="Search or select your major">
+        <datalist id="majorOptions"></datalist>
         <button onclick="getRecommendations()">Get Recommendations</button>
     </div>
     <ul id="results" class="results"></ul>
 
     <script>
+        // Load majors when page loads from db
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/majors');
+                const majors = await response.json();
+                const datalist = document.getElementById('majorOptions');
+                
+                majors.forEach(major => {
+                    const option = document.createElement('option');
+                    option.value = major.name;
+                    datalist.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Failed to load majors:', error);
+            }
+        });
+
         function getRecommendations() {
-            const major = document.getElementById('majorInput').value;
+            const major = document.getElementById('majorInput').value.trim();
             if (!major) {
-                alert('Please enter a major');
+                alert('Please select or enter a valid major');
                 return;
             }
-    
+
             const results = document.getElementById('results');
-            results.innerHTML = '<li class="course-card">Loading...</li>';
-    
+            results.innerHTML = '<li class="course-card">Loading recommendations...</li>';
+
             fetch(`/recommend?major=${encodeURIComponent(major)}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Network error');
@@ -69,7 +113,7 @@
                         results.innerHTML = '<li class="course-card">No courses found for this major</li>';
                         return;
                     }
-    
+
                     data.forEach(course => {
                         const li = document.createElement('li');
                         li.className = 'course-card';

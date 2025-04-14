@@ -1,11 +1,74 @@
 ﻿course_id,course_name
+Ph,Photography
+GD,Graphic Design
+SA,Studio Art
+AP2D,AP 2D Design
+AP3D,AP 3D Design
+APD,AP Drawing
+APAH,AP Art History
+CGT,Ceramics and Glass Tech.
+ACGT,Advanced Ceramics and Glass Tech.
+PM,Practical Music
+O,Orchestra
+APCP,AP Computer Science Principles
 APCS,AP Computer Science A
-APMM,AP Microeconomics and Macroeconomics
+ESLA,Elective Second Foreign Language: Language Acquisition
+ESLL,Elective Second Foreign Language: Linguistics
+FG3,French 3 / German 3
+FG4,French 4 / German 4
+ESTD,Elective Second Foreign Language: TEST DAF
+ESD,Elective Second Foreign Language: Delf B1/ B2
+APLa,AP English Language and Composition
+APLi,AP English Literature and Composition
+CW,Creative Writing
+LT,Literature and Technology
+FL1,Film & Literature 1
+FL2,Film & Literature 2
+ASL1,"Art, Science and Literature 1"
+ASL2,"Art, Science and Literature 2"
+MD,Modern Drama
+MN,Modern Novel
+Sh,Shakespeare
+J,Journalism
+WL,World Literature
+EFHE,Elective First Foreign Language: Humans and Environment
+EFCF,Elective First Foreign Language: Contemporary Film
+APS,AP Statistics
+M4AG,Math 4 Advanced Geometry
+M5DM,Math 5 Discrete Mathematics
+M7AM,Math 7 Advanced Mathematics
+APAB,AP Calculus AB
+APBC,AP Calculus BC
+LAMC,Elective Mathematics: Linear Algebra and Multivariable Calculus (LAMC)
+B2,Biology 2
+C2,Chemistry 2
+P2,Physics 2
+ECMC,Elective Chemistry: Medicinal Chemistry
+APB,AP Biology
 APC,AP Chemistry
-APEH,AP European History
-APEL,AP English Language and Composition
-APPC,AP Physics C Electricity and Magnetism
-APCB,AP Calculus BC
-DM,Discrete Mathematics
+APPM,AP Physics C Mechanics
+APEM,AP Physics C E & M
+APES,AP Environmental Science
+P3MP,Physics 3: Modern Physics
+EPE,Elective Physics: Electronics
+C3OC,Chemistry 3 (Organic Chemistry)
+EBHD,Elective Biology: Human Diseases
+MoB,Biology Research: Molecular Biology
+MaB,Biology Research: Marine Biology
+EB,Elective Biology
+EP,Elective Physics
+EC,Elective Chemistry
+EBB,Elective Biology: BioDesign
 E,Economics
-APCG,AP Comparative Government
+EG,Elective Geography (GIS)
+CTWH,Contemporary Turkish and World History
+APCG,AP Comparative Government and Politics
+APEH,AP European History
+APMM,AP Macro-Micro Economics
+APP,AP Psychology
+APWH,AP World History - Modern
+Ps,Psychology
+So,Sociology
+ETLL,Elective Turkish Language and Literature
+RW,Rhetoric and Writing
+TD,Turkish Drama
