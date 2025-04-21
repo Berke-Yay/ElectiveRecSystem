@@ -1,21 +1,38 @@
 from flask import Flask, jsonify, request, render_template
-from neo4j import GraphDatabase
+from neo4j import GraphDatabase, basic_auth
+
+URI  = "neo4j+s://96eeb76b.databases.neo4j.io"
+USER = "neo4j"
+PWD  = "password_here"
 
 app = Flask(__name__)
 
 driver = GraphDatabase.driver(
-    "bolt://localhost:7687",
-    auth=("neo4j", "password_goes_here") 
+    URI,
+    auth=basic_auth(USER, PWD),
+    connection_timeout=15,        
+    max_connection_lifetime=60*60 
 )
 
 def get_course_recommendations(tx, major):
     query = """
     MATCH (m:Major {name: $major})-[r:HAS_COURSE]->(c:Course)
     OPTIONAL MATCH (c)-[b:BUNDLED_WITH {major: $major}]-(other:Course)
-    WITH c, r.popularity AS popularity, COALESCE(SUM(b.count), 0) AS bundle_score
+    OPTIONAL MATCH (c)<-[took:TOOK]-(s:Student)-[:HAS_MAJOR]->(m)
+    WITH c, r.popularity AS popularity, 
+         COALESCE(SUM(b.count), 0) AS bundle_score,
+         COLLECT(took.grade) AS grades
+    WITH c, popularity, bundle_score,
+         [grade in grades WHERE grade IS NOT NULL | toFloat(grade)] AS numeric_grades
     RETURN c.code AS code, 
            c.name AS name, 
-           (bundle_score * 0.7 + popularity * 0.3) AS score
+           (bundle_score * 0.7 + popularity * 0.3) AS score,
+           CASE WHEN size(numeric_grades) > 0 
+                THEN round(
+                    reduce(total = 0.0, n IN numeric_grades | total + n)
+                    / size(numeric_grades),
+                    2)
+                ELSE NULL END AS avg_grade
     ORDER BY score DESC
     LIMIT 10
     """
